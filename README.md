@@ -57,6 +57,18 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+### Future Application Runs 
+
+```bash
+cd fluorescent-signal-normalization
+cd web
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
 ## How to Use
 
 ### 1. Upload a file
@@ -127,29 +139,6 @@ Drop an `.xlsx` file onto the drop zone or click to browse. Only `.xlsx` files a
 
 ---
 
-## Command-Line Usage
-
-You can also run the Python scripts directly.
-
-### Transpose
-
-```bash
-python transpose_excel.py input.xlsx [output.xlsx] [--start-cell B8]
-```
-
-### Normalize
-
-```bash
-python normalize.py input.xlsx [output.xlsx] [--first-n-reads 30] [--filter-letters "A, B, C"] [--filter-range "1 to 12"]
-```
-
-### FP_AUC
-
-```bash
-python fp_auc.py normalized.xlsx [output.xlsx]
-```
-
----
 
 ## Project Structure
 
