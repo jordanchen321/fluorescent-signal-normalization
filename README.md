@@ -60,12 +60,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Command-line usage
 
-You can also run the Python scripts directly:
+When running Program:
 
 ```bash
-# Transpose
-python transpose_excel.py input.xlsx [output.xlsx] [--start-cell B9]
-
-# Normalize
-python normalize.py input.xlsx [output.xlsx] [--max-seconds 30]
+cd web 
+npm run dev 
 ```
