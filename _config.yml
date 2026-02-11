@@ -1,0 +1,9 @@
+# Jekyll config for GitHub Pages - exclude npm/Python build artifacts
+exclude:
+  - node_modules
+  - web/node_modules
+  - .next
+  - tmp
+  - .git
+  - __pycache__
+  - "*.pyc"

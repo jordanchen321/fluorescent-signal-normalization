@@ -1,6 +1,0 @@
-{
-  "/api/normalize/route": "app/api/normalize/route.js",
-  "/api/run-all/route": "app/api/run-all/route.js",
-  "/api/transpose/route": "app/api/transpose/route.js",
-  "/page": "app/page.js"
-}
