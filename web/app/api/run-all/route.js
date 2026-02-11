@@ -8,6 +8,7 @@ export async function POST(request) {
   let inputPath;
   let transposedPath;
   let outputPath;
+  let fpAucPath;
 
   try {
     const formData = await request.formData();
@@ -19,13 +20,13 @@ export async function POST(request) {
       );
     }
 
-    const startCell = (formData.get("startCell") || "B9").toString().trim() || "B9";
+    const startCell = (formData.get("startCell") || "B8").toString().trim() || "B8";
 
-    const maxSecondsRaw = formData.get("maxSeconds");
-    let maxSeconds = null;
-    if (maxSecondsRaw != null && maxSecondsRaw !== "") {
-      const parsed = parseFloat(String(maxSecondsRaw).trim());
-      if (!isNaN(parsed) && parsed > 0) maxSeconds = parsed;
+    const firstNReadsRaw = formData.get("firstNReads");
+    let firstNReads = 30;
+    if (firstNReadsRaw != null && firstNReadsRaw !== "") {
+      const parsed = parseInt(String(firstNReadsRaw).trim(), 10);
+      if (!isNaN(parsed) && parsed >= 1) firstNReads = parsed;
     }
 
     const projectRoot = join(process.cwd(), "..");
@@ -74,6 +75,9 @@ export async function POST(request) {
 
     const transposeScript = join(projectRoot, "transpose_excel.py");
     const normalizeScript = join(projectRoot, "normalize.py");
+    const fpAucScript = join(projectRoot, "fp_auc.py");
+
+    fpAucPath = join(tmpDir, `${id}_fp_auc.xlsx`);
 
     await runPy([
       transposeScript,
@@ -84,31 +88,46 @@ export async function POST(request) {
     ]);
 
     const normArgs = [normalizeScript, transposedPath, outputPath];
-    if (maxSeconds != null) {
-      normArgs.push("--max-seconds", String(maxSeconds));
+    if (firstNReads !== 30) {
+      normArgs.push("--first-n-reads", String(firstNReads));
+    }
+    const filterLetters = formData.get("filterLetters")?.toString().trim();
+    const filterRange = formData.get("filterRange")?.toString().trim();
+    if (filterLetters && filterRange) {
+      normArgs.push("--filter-letters", filterLetters);
+      normArgs.push("--filter-range", filterRange);
     }
     await runPy(normArgs);
 
-    const outBuffer = await readFile(outputPath);
+    await runPy([fpAucScript, outputPath, fpAucPath]);
+
     const baseName = file.name ? String(file.name).replace(/\.[^.]+$/, "") : "file";
-    const filename = `${baseName}_normalized.xlsx`;
+    const normalizedName = `${baseName}_normalized.xlsx`;
+    const fpAucName = `${baseName}_FP_AUC.xlsx`;
+
+    const normalizedBuffer = await readFile(outputPath);
+    const fpAucBuffer = await readFile(fpAucPath);
 
     await unlink(inputPath).catch(() => {});
     await unlink(transposedPath).catch(() => {});
     await unlink(outputPath).catch(() => {});
+    await unlink(fpAucPath).catch(() => {});
 
-    return new NextResponse(outBuffer, {
-      status: 200,
-      headers: {
-        "Content-Type":
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "Content-Disposition": `attachment; filename="${filename}"`,
+    return NextResponse.json({
+      normalized: {
+        base64: normalizedBuffer.toString("base64"),
+        filename: normalizedName,
+      },
+      fpAuc: {
+        base64: fpAucBuffer.toString("base64"),
+        filename: fpAucName,
       },
     });
   } catch (err) {
     if (inputPath) await unlink(inputPath).catch(() => {});
     if (transposedPath) await unlink(transposedPath).catch(() => {});
     if (outputPath) await unlink(outputPath).catch(() => {});
+    if (fpAucPath) await unlink(fpAucPath).catch(() => {});
     console.error(err);
     return NextResponse.json(
       {

@@ -16,11 +16,12 @@ def col_letter_to_index(s: str) -> int:
 def transpose_xlsx(
     input_path: str | Path,
     output_path: str | Path | None = None,
-    data_start_cell: str = "B9",
+    data_start_cell: str = "B8",
 ) -> Path:
     """
-    Read data from input_path starting at data_start_cell (default cell B9).
+    Read data from input_path starting at data_start_cell (default cell B8).
     The column starting there (e.g. No., A1, A2, ...) becomes the first row of the output file.
+    Removes Comment and Type rows after transposing.
 
     If output_path is None, it is derived from input_path by appending '_transposed'.
     """
@@ -42,10 +43,15 @@ def transpose_xlsx(
     # Read entire first sheet as raw values (no header)
     df_raw = pd.read_excel(input_path, header=None, engine="openpyxl")
 
-    # Slice from start cell to end: first column of this block becomes first row of output
+    # Slice from start cell to end
     data = df_raw.iloc[start_row:, start_col:].copy()
 
-    # Trim only trailing empty rows and columns (Trims last column and last row)
+    # Remove Comment and Type rows (same logic as Step 2)
+    first_col = data.iloc[:, 0].astype(str).str.strip()
+    mask = (first_col.str.lower() != "comment") & (first_col.str.lower() != "type")
+    data = data[mask].reset_index(drop=True)
+
+    # Trim only trailing empty rows and columns
     while len(data) and data.iloc[-1].isna().all():
         data = data.iloc[:-1]
     while len(data.columns) and data.iloc[:, -1].isna().all():
@@ -62,12 +68,12 @@ def transpose_xlsx(
 def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: python transpose_excel.py <input.xlsx> [output.xlsx] [--start-cell CELL]")
-        print("  Default: data starts at B9; first column (No., A1, A2, ...) becomes first row of output.")
+        print("  Default: data starts at B8; first column (No., A1, A2, ...) becomes first row of output.")
         print("  --start-cell   Start cell (e.g. B9 if your No. column is in B). Default: A9")
         sys.exit(1)
 
     args = sys.argv[1:]
-    start_cell = "B9"
+    start_cell = "B8"
     non_flag = []
     i = 0
     while i < len(args):

@@ -44,7 +44,7 @@ a:hover {
 
 .container {
   width: 100%;
-  max-width: 420px;
+  max-width: 960px;
 }
 
 .section {
@@ -215,40 +215,44 @@ a:hover {
 
 .steps {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex-direction: row;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
 .step {
-  padding: 1.25rem;
+  flex: 1;
+  min-width: 200px;
+  padding: 1.5rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.step--2 {
+  flex: 1.5;
+  min-width: 280px;
 }
 
 .step--locked {
   opacity: 0.7;
 }
 
-.step--locked .step__title::after {
-  content: " (complete Step 1 first)";
-  font-weight: 400;
-  color: var(--muted);
-  font-size: 0.85em;
-}
-
 .step__title {
   font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
 }
 
 .step__desc {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--muted);
   margin-bottom: 1rem;
-  line-height: 1.45;
+  line-height: 1.6;
+  word-wrap: break-word;
 }
 
 .step__desc em {
@@ -257,7 +261,13 @@ a:hover {
 }
 
 .button--step {
-  margin-top: 0.25rem;
+  margin-top: auto;
+  padding-top: 0.25rem;
+}
+
+.button--step-fixed {
+  width: 100%;
+  min-width: 8rem;
 }
 
 .button--primary {
@@ -274,4 +284,80 @@ a:hover {
 
 .option__input--number {
   width: 6rem;
+}
+
+.option__input--wide {
+  width: 10rem;
+  flex: 0 0 auto;
+}
+
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.range-inputs__to {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.toggle-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.button--toggle {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.button--toggle-active {
+  background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+  color: var(--bg);
+}
+
+.button--toggle:not(.button--toggle-active) {
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+.button--toggle:not(.button--toggle-active):hover {
+  color: var(--text);
+}
+
+.save-location {
+  flex-wrap: wrap;
+}
+
+.save-location__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.save-location__path {
+  font-size: 0.9rem;
+  color: var(--text);
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.button--small {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+}
+
+.button--secondary {
+  background: var(--border);
+  color: var(--text);
+}
+
+.button--secondary:hover {
+  background: var(--muted);
 }

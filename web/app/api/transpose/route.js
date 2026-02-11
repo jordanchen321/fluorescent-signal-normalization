@@ -18,7 +18,7 @@ export async function POST(request) {
       );
     }
 
-    const startCell = (formData.get("startCell") || "A9").toString().trim() || "A9";
+    const startCell = (formData.get("startCell") || "B8").toString().trim() || "B8";
 
     const projectRoot = join(process.cwd(), "..");
     const scriptPath = join(projectRoot, "transpose_excel.py");

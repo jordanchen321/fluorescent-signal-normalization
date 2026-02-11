@@ -18,11 +18,11 @@ export async function POST(request) {
       );
     }
 
-    const maxSecondsRaw = formData.get("maxSeconds");
-    let maxSeconds = null;
-    if (maxSecondsRaw != null && maxSecondsRaw !== "") {
-      const parsed = parseFloat(String(maxSecondsRaw).trim());
-      if (!isNaN(parsed) && parsed > 0) maxSeconds = parsed;
+    const firstNReadsRaw = formData.get("firstNReads");
+    let firstNReads = 30;
+    if (firstNReadsRaw != null && firstNReadsRaw !== "") {
+      const parsed = parseInt(String(firstNReadsRaw).trim(), 10);
+      if (!isNaN(parsed) && parsed >= 1) firstNReads = parsed;
     }
 
     const projectRoot = join(process.cwd(), "..");
@@ -37,8 +37,14 @@ export async function POST(request) {
     await writeFile(inputPath, buffer);
 
     const args = [scriptPath, inputPath, outputPath];
-    if (maxSeconds != null) {
-      args.push("--max-seconds", String(maxSeconds));
+    if (firstNReads !== 30) {
+      args.push("--first-n-reads", String(firstNReads));
+    }
+    const filterLetters = formData.get("filterLetters")?.toString().trim();
+    const filterRange = formData.get("filterRange")?.toString().trim();
+    if (filterLetters && filterRange) {
+      args.push("--filter-letters", filterLetters);
+      args.push("--filter-range", filterRange);
     }
 
     const run = (pyCmd) =>
