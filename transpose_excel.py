@@ -61,6 +61,10 @@ def transpose_xlsx(
     transposed = data.T
     transposed.reset_index(drop=True, inplace=True)
 
+    # Drop leading empty columns (move all columns left by one)
+    while len(transposed.columns) and transposed.iloc[:, 0].isna().all():
+        transposed = transposed.iloc[:, 1:].reset_index(drop=True)
+
     transposed.to_excel(output_path, index=False, header=False, engine="openpyxl")
     return output_path
 
